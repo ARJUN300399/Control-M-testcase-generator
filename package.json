@@ -1,0 +1,15 @@
+{
+  "name": "codespaces-blank",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tcGenerator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "arjun",
+  "license": "ISC",
+  "dependencies": {
+    "exceljs": "^4.3.0",
+    "xml2js": "^0.5.0"
+  }
+}
