@@ -21,11 +21,18 @@ async function parseJobDefinitions(jobDefinitionsFile) {
   const jobNodes = parsedXml.DEFTABLE.FOLDER.flatMap(folder => folder.JOB);
 
   const jobDefinitions = jobNodes.map(jobNode => {
-    const commandWithQuotes = jobNode.$.CHOLINE;
-    const commandWithoutQuotes = commandWithQuotes.replace(/&quot;/g, "").trim();
-    const commandParts = commandWithoutQuotes.split(" ");
-    const filePath = commandParts.shift();
-    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+    let commandWithQuotes = jobNode.$.CHOLINE;
+    let commandWithoutQuotes = "";
+    let commandParts = [];
+    let filePath = "";
+    let fileName = "";
+
+    if (commandWithQuotes) {
+      commandWithoutQuotes = commandWithQuotes.replace(/&quot;/g, "").trim();
+      commandParts = commandWithoutQuotes.split(" ");
+      filePath = commandParts.shift();
+      fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+    }
 
     return {
       jobNumber: jobNode.$.JOBSN,
@@ -40,6 +47,7 @@ async function parseJobDefinitions(jobDefinitionsFile) {
 
   return jobDefinitions;
 }
+
 
 
 async function generateExcelReport(jobDefinitions, outputExcelFile) {
