@@ -30,7 +30,6 @@ async function parseJobDefinitions(jobDefinitionsFile) {
   return jobDefinitions;
 }
 
-
 async function generateExcelReport(jobDefinitions, outputExcelFile) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Jobs");
@@ -59,51 +58,53 @@ async function generateExcelReport(jobDefinitions, outputExcelFile) {
   // Header row
   sheet.addRow(columns).eachCell((cell, colNumber) => {
     cell.font = { bold: true, name: "Calibri", size: 11 };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFBFBFBF" }
+    };
   });
 
   // Add test case rows
   let testCaseCounter = 1;
-  jobDefinitions.forEach((job) => {
+  jobDefinitions.forEach(job => {
     const testName = `TC${testCaseCounter}_${job.name} job validation`;
-    const rowStart = testCaseCounter * 5 - 4;
+    const description = `To validate job ${job.name} for file watch for ${job.command}`;
+    const rowStart = (testCaseCounter - 1) * 5 + 2;
     const rowEnd = rowStart + 4;
-
-    const mergedColumns = [
-      { index: 1, value: "L123" },
-      { index: 2, value: "Draft" },
-      { index: 3, value: "3-Medium" },
-      { index: 4, value: testName },
-      { index: 5, value: `To validate job ${job.name} for file watch for ${job.command}` },
-      { index: 9, value: "SAS" },
-      { index: 10, value: "Manual" },
-      { index: 11, value: "No" },
-      { index: 12, value: "Positive test" },
-      { index: 13, value: "UUU" },
-      { index: 14, value: "ooo" },
-      { index: 15, value: "Other Needs" },
-      { index: 16, value: "No" },
-      { index: 17, value: "Unit testing" }
-    ];
-
-    const stepNames = ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"];
-    const designStepsDesc = ["A", "B", "C", "D", "E"];
-    const expectedResult = ["Abc", "Bce", "Cde", "Def", "Efg"];
 
     for (let rowNumber = rowStart; rowNumber <= rowEnd; rowNumber++) {
       const row = sheet.addRow([]);
 
-      // Merge cells and set values for specified columns
-      mergedColumns.forEach(({ index, value }) => {
-        if (rowNumber === rowStart) {
-          sheet.mergeCells(`A${rowStart}:A${rowEnd}`);
-        }
-        sheet.getCell(`${columns[index - 1]}${rowStart}`).value = value;
-      });
+      // Merge cells and set values for LID, Status, Test Priority, Test Name, etc.
+      if (rowNumber === rowStart) {
+        const fieldsToMerge = [
+          { col: "A", value: "L123" },
+          { col: "B", value: "Draft" },
+          { col: "C", value: "3-Medium" },
+          { col: "D", value: testName },
+          { col: "E", value: description },
+          { col: "I", value: "SAS" },
+          { col: "J", value: "Manual" },
+          { col: "K", value: "No" },
+          { col: "L", value: "Positive test" },
+          { col: "M", value: "UUU" },
+          { col: "N", value: "ooo" },
+          { col: "O", value: "Other Needs" },
+          { col: "P", value: "No" },
+          { col: "Q", value: "Unit testing" }
+        ];
 
-      // Set values for Step Name, Design Steps Description, and Expected Result columns
-      row.getCell("Step Name").value = stepNames[rowNumber - rowStart];
-      row.getCell("Description (Design Steps)").value = designStepsDesc[rowNumber - rowStart];
-      row.getCell("Expected Result (Design Steps)").value = expectedResult[rowNumber - rowStart];
+        fieldsToMerge.forEach(field => {
+          sheet.mergeCells(`${field.col}${rowStart}:${field.col}${rowEnd}`);
+          sheet.getCell(`${field.col}${rowStart}`).value = field.value;
+        });
+      }
+
+      // Set values for Step Name, Description (Design Steps), and Expected Result (Design Steps) columns
+      row.getCell("F").value = `Step ${rowNumber - rowStart + 1}`;
+      row.getCell("G").value = String.fromCharCode(64 + (rowNumber - rowStart + 1));
+      row.getCell("H").value = String.fromCharCode(64 + (rowNumber - rowStart + 2)) + String.fromCharCode(64 + (rowNumber - rowStart + 3)) + String.fromCharCode(64 + (rowNumber - rowStart + 4));
     }
 
     testCaseCounter++;
