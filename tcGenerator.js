@@ -7,6 +7,9 @@ const ExcelJS = require("exceljs");
   const jobDefinitions = await parseJobDefinitions(jobDefinitionsFile);
 
   const outputExcelFile = "path/to/your/testing_report.xlsx";
+  if (fs.existsSync(outputExcelFile)) {
+    fs.unlinkSync(outputExcelFile);
+  }
   await generateExcelReport(jobDefinitions, outputExcelFile);
 })();
 
