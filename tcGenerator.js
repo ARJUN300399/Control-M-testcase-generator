@@ -19,6 +19,7 @@ async function parseJobDefinitions(jobDefinitionsFile) {
 
   const jobDefinitions = jobNodes.map(jobNode => {
     return {
+      jobNumber: jobNode.$.JOBSN,
       name: jobNode.$.JOBNAME,
       command: jobNode.$.CHOLINE,
       host: jobNode.$.NODEID,
