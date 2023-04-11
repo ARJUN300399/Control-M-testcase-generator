@@ -70,23 +70,26 @@ async function generateExcelReport(jobDefinitions, outputExcelFile) {
 
   // Add test case rows
   let testCaseCounter = 1;
-  jobDefinitions.forEach(job => {
+  jobDefinitions.forEach((job) => {
     const testName = `TC${testCaseCounter}_${job.name} job validation`;
-    const description = `To validate job ${job.name} for file watch for ${job.command}`;
-    const rowStart = (testCaseCounter - 1) * 5 + 2;
+    const rowStart = testCaseCounter * 5;
     const rowEnd = rowStart + 4;
+
+    const stepNames = ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"];
+    const designStepDescriptions = ["Auto", "Mation", "Noida", "Delhi", "Alwar"];
+    const expectedResultDescriptions = ["Hello", "All", "Project", "Wale", "Efg"];
 
     for (let rowNumber = rowStart; rowNumber <= rowEnd; rowNumber++) {
       const row = sheet.addRow([]);
 
-      // Merge cells and set values for LID, Status, Test Priority, Test Name, etc.
+      // Merge cells and set values for specified columns
       if (rowNumber === rowStart) {
-        const fieldsToMerge = [
+        const mergedColumns = [
           { col: "A", value: "L123" },
           { col: "B", value: "Draft" },
           { col: "C", value: "3-Medium" },
           { col: "D", value: testName },
-          { col: "E", value: description },
+          { col: "E", value: `To validate job ${job.name} for file watch for ${job.command}` },
           { col: "I", value: "SAS" },
           { col: "J", value: "Manual" },
           { col: "K", value: "No" },
@@ -95,19 +98,20 @@ async function generateExcelReport(jobDefinitions, outputExcelFile) {
           { col: "N", value: "ooo" },
           { col: "O", value: "Other Needs" },
           { col: "P", value: "No" },
-          { col: "Q", value: "Unit testing" }
+          { col: "Q", value: "Unit testing" },
         ];
 
-        fieldsToMerge.forEach(field => {
-          sheet.mergeCells(`${field.col}${rowStart}:${field.col}${rowEnd}`);
-          sheet.getCell(`${field.col}${rowStart}`).value = field.value;
+        mergedColumns.forEach(({ col, value }) => {
+          sheet.mergeCells(`${col}${rowStart}:${col}${rowEnd}`);
+          sheet.getCell(`${col}${rowStart}`).value = value;
         });
       }
 
       // Set values for Step Name, Description (Design Steps), and Expected Result (Design Steps) columns
-      row.getCell("F").value = `Step ${rowNumber - rowStart + 1}`;
-      row.getCell("G").value = String.fromCharCode(64 + (rowNumber - rowStart + 1));
-      row.getCell("H").value = String.fromCharCode(64 + (rowNumber - rowStart + 2)) + String.fromCharCode(64 + (rowNumber - rowStart + 3)) + String.fromCharCode(64 + (rowNumber - rowStart + 4));
+      const stepIndex = rowNumber - rowStart;
+      row.getCell("F").value = stepNames[stepIndex];
+      row.getCell("G").value = designStepDescriptions[stepIndex];
+      row.getCell("H").value = expectedResultDescriptions[stepIndex];
     }
 
     testCaseCounter++;
