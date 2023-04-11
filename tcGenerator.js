@@ -21,17 +21,26 @@ async function parseJobDefinitions(jobDefinitionsFile) {
   const jobNodes = parsedXml.DEFTABLE.FOLDER.flatMap(folder => folder.JOB);
 
   const jobDefinitions = jobNodes.map(jobNode => {
+    const commandWithQuotes = jobNode.$.CHOLINE;
+    const commandWithoutQuotes = commandWithQuotes.replace(/&quot;/g, "").trim();
+    const commandParts = commandWithoutQuotes.split(" ");
+    const filePath = commandParts.shift();
+    const fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+
     return {
       jobNumber: jobNode.$.JOBSN,
       name: jobNode.$.JOBNAME,
-      command: jobNode.$.CHOLINE,
+      command: commandParts.join(" "),
       host: jobNode.$.NODEID,
-      user: jobNode.$.RUN_AS
+      user: jobNode.$.RUN_AS,
+      filePath: filePath,
+      fileName: fileName
     };
   });
 
   return jobDefinitions;
 }
+
 
 async function generateExcelReport(jobDefinitions, outputExcelFile) {
   const workbook = new ExcelJS.Workbook();
